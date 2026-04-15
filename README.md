@@ -1,48 +1,48 @@
-# OpenClaw vs Hermes Agent — 对比报告
+# OpenClaw vs Hermes Agent — Comparison Report
 
-> 两大 AI Agent 平台的全面对比分析 · 2026 年 4 月
+> Comprehensive analysis of two leading AI Agent platforms · April 2026
 
-## 在线预览
+## Live Demo
 
 👉 [https://qiuyanlong16.github.io/hermes-vs-openclaw/](https://qiuyanlong16.github.io/hermes-vs-openclaw/)
 
-## 内容概述
+## Overview
 
-从以下 6 个维度深度对比 **OpenClaw** 与 **Hermes Agent**：
+In-depth comparison of **OpenClaw** and **Hermes Agent** across 6 key dimensions:
 
-| 维度 | 说明 |
-|------|------|
-|  能力与架构 | 架构模式、定位、Skills/Tools、并行能力 |
-| 🔒 安全性 | 安全审计、审批模型、容器隔离 |
-| 🚀 部署方式 | 后端类型、Serverless 支持、Web UI |
-| 💬 Channel 接入 | 20+ vs 15+ 消息平台覆盖 |
-| 💾 Memory 与学习 | 持久化记忆、FTS5 检索、自学习循环 |
-| 🌐 生态与扩展 | Stars、Skill 生态、MCP、研究能力 |
+| Dimension | Coverage |
+|-----------|----------|
+| ⚙️ Capabilities & Architecture | Architecture patterns, positioning, Skills/Tools, parallel execution |
+| 🔒 Security | Security audits, approval models, container isolation |
+| 🚀 Deployment | Backend types, Serverless support, Web UI |
+| 💬 Channels | 20+ vs 15+ messaging platform coverage |
+| 💾 Memory & Learning | Persistent memory, FTS5 search, self-learning loop |
+| 🌐 Ecosystem & Extensions | Stars, Skill ecosystems, MCP, research capabilities |
 
-## 核心结论
+## Key Takeaway
 
-- **OpenClaw** = 更好的 **平台**（基础设施、生态系统、团队运营）
-- **Hermes Agent** = 更好的 **运营者**（自主学习、自我改进、持续运行）
-- 两者实际不竞争同一场景
+- **OpenClaw** = Better **Platform** (infrastructure, ecosystem, team operations)
+- **Hermes Agent** = Better **Operator** (autonomous learning, self-improvement, continuous operation)
+- They don't compete for the same use case
 
-## 技术栈
+## Tech Stack
 
-- 纯静态 HTML/CSS/JS（无需构建）
+- Pure static HTML/CSS/JS (no build step)
 - Tailwind CSS (CDN)
-- Chart.js 雷达图
-- 中英双语切换
-- 响应式设计（桌面/平板/移动）
+- Chart.js radar chart
+- Bilingual CN/EN toggle
+- Responsive design (desktop/tablet/mobile)
 
-## 本地运行
+## Local Development
 
 ```bash
 python3 -m http.server 8080
 # open http://localhost:8080
 ```
 
-## 数据来源
+## Data Sources
 
-- [OpenClaw 官方文档](https://docs.openclaw.ai/)
-- [Hermes Agent 官方文档](https://hermes-agent.nousresearch.com/docs)
+- [OpenClaw Docs](https://docs.openclaw.ai/)
+- [Hermes Agent Docs](https://hermes-agent.nousresearch.com/docs)
 - [Hermes Agent GitHub](https://github.com/nousresearch/hermes-agent)
-- 社区评测文章
+- Community comparison articles
