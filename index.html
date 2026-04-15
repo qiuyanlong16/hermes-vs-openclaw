@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="zh" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenClaw vs Hermes Agent | 对比报告</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans SC', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            claw: { DEFAULT: '#FF6B35', light: '#FF8F5E', dark: '#CC5528', bg: '#1a1210' },
+            hermes: { DEFAULT: '#FFD700', light: '#FFE44D', dark: '#CCB000', bg: '#1a1710' },
+            surface: { DEFAULT: '#111111', light: '#1a1a1a', lighter: '#252525', dark: '#0a0a0a' },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif; }
+    .gradient-claw { background: linear-gradient(135deg, #FF6B35, #FF8F5E); }
+    .gradient-hermes { background: linear-gradient(135deg, #FFD700, #FFE44D); }
+    .gradient-text-claw { background: linear-gradient(135deg, #FF6B35, #FFB088); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .gradient-text-hermes { background: linear-gradient(135deg, #FFD700, #FFE44D); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+    .fade-in { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+    .section-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
+    .table-row-hover { transition: background 0.2s; }
+    .table-row-hover:hover { background: rgba(255,255,255,0.03); }
+    .nav-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    .pulse-dot { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    ::selection { background: rgba(255,107,53,0.3); }
+    .dark ::selection { background: rgba(255,107,53,0.4); }
+  </style>
+</head>
+<body class="bg-surface-dark text-gray-100 antialiased dark">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-surface-dark/80 border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-14">
+        <div class="flex items-center gap-3">
+          <span class="text-lg font-bold gradient-text-claw">OpenClaw</span>
+          <span class="text-gray-500 font-light">vs</span>
+          <span class="text-lg font-bold gradient-text-hermes">Hermes</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <button id="langToggle" onclick="toggleLang()" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors">
+            <span id="langLabel">EN</span>
+          </button>
+          <a href="#conclusion" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-claw/20 text-claw hover:bg-claw/30 transition-colors hidden sm:block" data-zh="选型建议" data-en="Verdict">选型建议</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="relative min-h-screen flex items-center justify-center pt-14 overflow-hidden">
+    <div class="absolute inset-0">
+      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-claw/5 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-hermes/5 rounded-full blur-3xl"></div>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-4 text-center">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8">
+        <span class="w-2 h-2 rounded-full bg-green-400 pulse-dot"></span>
+        <span class="text-sm text-gray-400" data-zh="2026 年 4 月 · 深度对比分析" data-en="April 2026 · In-Depth Analysis">2026 年 4 月 · 深度对比分析</span>
+      </div>
+      <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight mb-6">
+        <span class="gradient-text-claw">OpenClaw</span>
+        <span class="text-gray-500 font-light mx-3 sm:mx-6">vs</span>
+        <span class="gradient-text-hermes">Hermes Agent</span>
+      </h1>
+      <p class="text-xl sm:text-2xl text-gray-400 font-light max-w-3xl mx-auto mb-4" data-zh="两大 AI Agent 平台全面对比报告" data-en="Comprehensive Comparison Report of Two AI Agent Platforms">两大 AI Agent 平台全面对比报告</p>
+      <p class="text-base text-gray-500 max-w-2xl mx-auto mb-12" data-zh="从能力、安全性、部署、Channel 接入、Memory 与生态等维度，深度分析各自的优势与适用场景" data-en="Deep analysis across capabilities, security, deployment, channels, memory, and ecosystem dimensions">从能力、安全性、部署、Channel 接入、Memory 与生态等维度，深度分析各自的优势与适用场景</p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="#quick-verdict" class="px-8 py-3 rounded-xl gradient-claw text-white font-semibold hover:opacity-90 transition-opacity" data-zh="快速查看结论" data-en="Quick Verdict">快速查看结论</a>
+        <a href="#radar" class="px-8 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors font-medium" data-zh="详细对比" data-en="Detailed Comparison">详细对比</a>
+      </div>
+      <div class="mt-20 flex items-center justify-center gap-8 text-sm text-gray-500">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded bg-claw/40"></span>
+          <span>OpenClaw · 353K ⭐</span>
+        </div>
+        <div class="w-px h-4 bg-gray-700"></div>
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded bg-hermes/40"></span>
+          <span>Hermes Agent · 64K ⭐</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Verdict Cards -->
+  <section id="quick-verdict" class="py-20 px-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-12 fade-in">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4" data-zh="快速结论" data-en="Quick Verdict">快速结论</h2>
+        <p class="text-gray-400" data-zh="一句话选型建议，30 秒速读" data-en="One-sentence recommendations, 30-second read">一句话选型建议，30 秒速读</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6">
+        <!-- Card 1: Choose OpenClaw -->
+        <div class="fade-in card-hover rounded-2xl border border-claw/20 bg-claw-bg/30 p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl gradient-claw flex items-center justify-center text-white font-bold text-lg">A</div>
+            <h3 class="text-lg font-bold" data-zh="选 OpenClaw" data-en="Choose OpenClaw">选 OpenClaw</h3>
+          </div>
+          <ul class="space-y-3 text-sm text-gray-300">
+            <li class="flex items-start gap-2">
+              <span class="text-claw mt-0.5">▸</span>
+              <span data-zh="需要 20+ 消息通道覆盖（iMessage、SMS、Web UI）" data-en="Need 20+ channel coverage (iMessage, SMS, Web UI)">需要 20+ 消息通道覆盖（iMessage、SMS、Web UI）</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-claw mt-0.5">▸</span>
+              <span data-zh="重视团队场景的数据隔离和共享 Assistant" data-en="Value team data isolation and shared Assistants">重视团队场景的数据隔离和共享 Assistant</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-claw mt-0.5">▸</span>
+              <span data-zh="依赖庞大 Skill 生态（10,700+ ClawHub）" data-en="Rely on large Skill ecosystem (10,700+ ClawHub)">依赖庞大 Skill 生态（10,700+ ClawHub）</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-claw mt-0.5">▸</span>
+              <span data-zh="需要内置 Web Control UI 和安全审计工具" data-en="Need built-in Web Control UI and security audit">需要内置 Web Control UI 和安全审计工具</span>
+            </li>
+          </ul>
+        </div>
+        <!-- Card 2: Choose Hermes -->
+        <div class="fade-in card-hover rounded-2xl border border-hermes/20 bg-hermes-bg/30 p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl gradient-hermes flex items-center justify-center text-black font-bold text-lg">B</div>
+            <h3 class="text-lg font-bold" data-zh="选 Hermes Agent" data-en="Choose Hermes Agent">选 Hermes Agent</h3>
+          </div>
+          <ul class="space-y-3 text-sm text-gray-300">
+            <li class="flex items-start gap-2">
+              <span class="text-hermes mt-0.5">▸</span>
+              <span data-zh="需要自主学习和自我改进能力" data-en="Need autonomous learning and self-improvement">需要自主学习和自我改进能力</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-hermes mt-0.5">▸</span>
+              <span data-zh="需要 Signal/钉钉/飞书/企业微信等通道" data-en="Need Signal/DingTalk/Feishu/WeCom channels">需要 Signal/钉钉/飞书/企业微信等通道</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-hermes mt-0.5">▸</span>
+              <span data-zh="需要 Serverless 部署（低成本空闲）" data-en="Need Serverless deployment (low idle cost)">需要 Serverless 部署（低成本空闲）</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-hermes mt-0.5">▸</span>
+              <span data-zh="需要 FTS5 全文检索 + LLM 记忆摘要" data-en="Need FTS5 full-text search + LLM memory summarization">需要 FTS5 全文检索 + LLM 记忆摘要</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-hermes mt-0.5">▸</span>
+              <span data-zh="进行 AI 研究（RL 训练、Batch Processing）" data-en="Conduct AI research (RL training, Batch Processing)">进行 AI 研究（RL 训练、Batch Processing）</span>
+            </li>
+          </ul>
+        </div>
+        <!-- Card 3: Bottom Line -->
+        <div class="fade-in card-hover rounded-2xl border border-white/10 bg-white/5 p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-gray-600 flex items-center justify-center text-white font-bold text-lg">!</div>
+            <h3 class="text-lg font-bold" data-zh="核心洞察" data-en="Key Insight">核心洞察</h3>
+          </div>
+          <div class="space-y-4 text-sm text-gray-300">
+            <p data-zh="两者实际不竞争同一场景：" data-en="They don't compete for the same use case:">两者实际不竞争同一场景：</p>
+            <div class="pl-4 border-l-2 border-claw/40">
+              <p class="font-medium text-claw-light mb-1" data-zh="OpenClaw = 更好的「平台」" data-en="OpenClaw = Better Platform">OpenClaw = 更好的「平台」</p>
+              <p class="text-gray-400" data-zh="基础设施、生态系统、团队运营" data-en="Infrastructure, ecosystem, team operations">基础设施、生态系统、团队运营</p>
+            </div>
+            <div class="pl-4 border-l-2 border-hermes/40">
+              <p class="font-medium text-hermes-light mb-1" data-zh="Hermes = 更好的「运营者」" data-en="Hermes = Better Operator">Hermes = 更好的「运营者」</p>
+              <p class="text-gray-400" data-zh="自主学习、自我改进、持续运行" data-en="Autonomous learning, self-improvement, continuous operation">自主学习、自我改进、持续运行</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-4xl mx-auto"></div>
+
+  <!-- Radar Chart Section -->
+  <section id="radar" class="py-20 px-4">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12 fade-in">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4" data-zh="能力雷达图" data-en="Capability Radar">能力雷达图</h2>
+        <p class="text-gray-400" data-zh="8 个核心维度的量化评分对比（1-5 分）" data-en="Quantified scoring across 8 core dimensions (1-5 scale)">8 个核心维度的量化评分对比（1-5 分）</p>
+      </div>
+      <div class="fade-in max-w-2xl mx-auto">
+        <div class="rounded-2xl border border-white/10 bg-surface-light p-6 sm:p-8">
+          <canvas id="radarChart" width="400" height="400"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-4xl mx-auto"></div>
+
+  <!-- Comparison Sections -->
+  <div id="comparison">
+
+    <!-- Section 1: Capabilities & Architecture -->
+    <section class="py-20 px-4" id="capabilities">
+      <div class="max-w-6xl mx-auto">
+        <div class="fade-in mb-10">
+          <span class="inline-block text-xs font-bold tracking-wider uppercase text-claw mb-2">01</span>
+          <h2 class="text-3xl sm:text-4xl font-bold mb-3" data-zh="能力与架构" data-en="Capabilities & Architecture">能力与架构</h2>
+          <p class="text-gray-400" data-zh="两者的核心架构设计哲学存在根本差异" data-en="Fundamental differences in core architectural design philosophy">两者的核心架构设计哲学存在根本差异</p>
+        </div>
+        <div class="fade-in overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-white/10">
+                <th class="text-left py-3 px-4 font-semibold text-gray-400" data-zh="项目" data-en="Feature">项目</th>
+                <th class="text-left py-3 px-4">
+                  <span class="gradient-text-claw font-bold">OpenClaw</span>
+                </th>
+                <th class="text-left py-3 px-4">
+                  <span class="gradient-text-hermes font-bold">Hermes Agent</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="架构模式" data-en="Architecture">架构模式</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="Hub-spoke · Gateway 中心路由" data-en="Hub-spoke · Central Gateway routing">Hub-spoke · Gateway 中心路由</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="单 Agent 向外扩展" data-en="Single Agent expanding outward">单 Agent 向外扩展</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="定位" data-en="Positioning">定位</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="平台 / 基础设施" data-en="Platform / Infrastructure">平台 / 基础设施</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="自主运营者" data-en="Autonomous Operator">自主运营者</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="内置 Skills/Tools" data-en="Built-in Skills/Tools">内置 Skills/Tools</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="52+ Skills" data-en="52+ Skills">52+ Skills</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="40+ Tools" data-en="40+ Tools">40+ Tools</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="并行子 Agent" data-en="Parallel Sub-Agents">并行子 Agent</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="支持" data-en="Supported">支持</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="支持（spawn isolated subagents）" data-en="Supported (spawn isolated subagents)">支持（spawn isolated subagents）</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="浏览器控制" data-en="Browser Control">浏览器控制</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="支持" data-en="Supported">支持</td>
+                <td class="py-4 px-4 text-hermes font-medium" data-zh="完整 Web 控制（搜索/提取/浏览/视觉/图像/TTS）" data-en="Full Web control (search/extract/browse/vision/image/TTS)">完整 Web 控制（搜索/提取/浏览/视觉/图像/TTS）</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="语音模式" data-en="Voice Mode">语音模式</td>
+                <td class="py-4 px-4 text-gray-500" data-zh="否" data-en="No">否</td>
+                <td class="py-4 px-4 text-hermes font-medium" data-zh="是（CLI / Telegram / Discord VC）" data-en="Yes (CLI / Telegram / Discord VC)">是（CLI / Telegram / Discord VC）</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="自动化调度" data-en="Automation">自动化调度</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="通过 Gateway" data-en="Via Gateway">通过 Gateway</td>
+                <td class="py-4 px-4 text-hermes font-medium" data-zh="内置 Cron 调度器" data-en="Built-in Cron scheduler">内置 Cron 调度器</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider max-w-6xl mx-auto"></div>
+
+    <!-- Section 2: Security -->
+    <section class="py-20 px-4" id="security">
+      <div class="max-w-6xl mx-auto">
+        <div class="fade-in mb-10">
+          <span class="inline-block text-xs font-bold tracking-wider uppercase text-claw mb-2">02</span>
+          <h2 class="text-3xl sm:text-4xl font-bold mb-3" data-zh="安全性" data-en="Security">安全性</h2>
+          <p class="text-gray-400" data-zh="各有侧重，都提供了企业级安全能力" data-en="Each has different focus, both provide enterprise-grade security">各有侧重，都提供了企业级安全能力</p>
+        </div>
+        <div class="fade-in grid md:grid-cols-2 gap-6">
+          <!-- OpenClaw Security -->
+          <div class="rounded-2xl border border-claw/15 bg-claw-bg/20 p-6">
+            <h3 class="text-lg font-bold gradient-text-claw mb-4" data-zh="OpenClaw 安全模型" data-en="OpenClaw Security Model">OpenClaw 安全模型</h3>
+            <ul class="space-y-3 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="text-claw mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="内置安全审计工具 — openclaw security audit" data-en="Built-in security audit — openclaw security audit"><strong>内置安全审计工具</strong> — openclaw security audit</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-claw mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="Trust Boundary Matrix — 信任边界矩阵" data-en="Trust Boundary Matrix">Trust Boundary Matrix — 信任边界矩阵</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-claw mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="Hardened Baseline — 60 秒安全基线配置" data-en="Hardened Baseline — 60-second secure configuration">Hardened Baseline — 60 秒安全基线配置</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-claw mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="Gateway/Node 信任概念 + 共享 Workspace 风险评估" data-en="Gateway/Node trust concept + shared Workspace risk assessment">Gateway/Node 信任概念 + 共享 Workspace 风险评估</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-claw mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="Researcher preflight checklist（研究预检清单）" data-en="Researcher preflight checklist">Researcher preflight checklist（研究预检清单）</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-claw mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="Scope-first 个人助手安全模型" data-en="Scope-first personal assistant security model">Scope-first 个人助手安全模型</span>
+              </li>
+            </ul>
+          </div>
+          <!-- Hermes Security -->
+          <div class="rounded-2xl border border-hermes/15 bg-hermes-bg/20 p-6">
+            <h3 class="text-lg font-bold gradient-text-hermes mb-4" data-zh="Hermes Agent 安全模型" data-en="Hermes Agent Security Model">Hermes Agent 安全模型</h3>
+            <ul class="space-y-3 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="危险命令审批 — 多种审批模式可选" data-en="Dangerous command approval — multiple approval modes">危险命令审批 — 多种审批模式可选</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="YOLO Mode + 审批超时 + 永久白名单" data-en="YOLO Mode + approval timeout + permanent allowlist">YOLO Mode + 审批超时 + 永久白名单</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="容器隔离 + Docker 安全标志 + 资源限制" data-en="Container isolation + Docker security flags + resource limits">容器隔离 + Docker 安全标志 + 资源限制</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="平台白名单 + DM 配对系统" data-en="Platform allowlist + DM pairing system">平台白名单 + DM 配对系统</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="Sudo 支持 + 文件系统持久化控制" data-en="Sudo support + filesystem persistence control">Sudo 支持 + 文件系统持久化控制</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="环境变量直通控制" data-en="Environment variable passthrough control">环境变量直通控制</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider max-w-6xl mx-auto"></div>
+
+    <!-- Section 3: Deployment -->
+    <section class="py-20 px-4" id="deployment">
+      <div class="max-w-6xl mx-auto">
+        <div class="fade-in mb-10">
+          <span class="inline-block text-xs font-bold tracking-wider uppercase text-claw mb-2">03</span>
+          <h2 class="text-3xl sm:text-4xl font-bold mb-3" data-zh="部署方式" data-en="Deployment">部署方式</h2>
+          <p class="text-gray-400" data-zh="部署灵活性与运行环境的对比" data-en="Comparing deployment flexibility and runtime environments">部署灵活性与运行环境的对比</p>
+        </div>
+        <div class="fade-in overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-white/10">
+                <th class="text-left py-3 px-4 font-semibold text-gray-400" data-zh="项目" data-en="Feature">项目</th>
+                <th class="text-left py-3 px-4"><span class="gradient-text-claw font-bold">OpenClaw</span></th>
+                <th class="text-left py-3 px-4"><span class="gradient-text-hermes font-bold">Hermes Agent</span></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="终端后端" data-en="Backends">终端后端</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="Gateway + Nodes + Plugin 槽位" data-en="Gateway + Nodes + Plugin slots">Gateway + Nodes + Plugin 槽位</td>
+                <td class="py-4 px-4 text-hermes font-medium" data-zh="6 种后端（Local/Docker/SSH/Daytona/Singularity/Modal）" data-en="6 backends (Local/Docker/SSH/Daytona/Singularity/Modal)">6 种后端（Local/Docker/SSH/Daytona/Singularity/Modal）</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="Serverless" data-en="Serverless">Serverless</td>
+                <td class="py-4 px-4 text-gray-500" data-zh="否" data-en="No">否</td>
+                <td class="py-4 px-4 text-hermes font-medium" data-zh="Daytona + Modal（空闲近乎零成本）" data-en="Daytona + Modal (near-zero idle cost)">Daytona + Modal（空闲近乎零成本）</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="安装速度" data-en="Install speed">安装速度</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="快速安装" data-en="Quick install">快速安装</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="60 秒安装（Linux/macOS/WSL2）" data-en="60-second install (Linux/macOS/WSL2)">60 秒安装（Linux/macOS/WSL2）</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="Web UI" data-en="Web UI">Web UI</td>
+                <td class="py-4 px-4 text-claw font-medium" data-zh="内置 Web Control UI + Mobile Nodes" data-en="Built-in Web Control UI + Mobile Nodes">内置 Web Control UI + Mobile Nodes</td>
+                <td class="py-4 px-4 text-gray-500" data-zh="否（主要 CLI + Gateway）" data-en="No (primarily CLI + Gateway)">否（主要 CLI + Gateway）</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="远程部署" data-en="Remote">远程部署</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="远程 macOS Nodes（Linux Gateway）" data-en="Remote macOS Nodes (Linux Gateway)">远程 macOS Nodes（Linux Gateway）</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="SSH 后端 + 云端 VM 无需 SSH 直接对话" data-en="SSH backend + cloud VM without direct SSH">SSH 后端 + 云端 VM 无需 SSH 直接对话</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="配置管理" data-en="Config">配置管理</td>
+                <td class="py-4 px-4 text-claw font-medium" data-zh="热重载 + 编程式 RPC 更新" data-en="Hot reload + programmatic RPC updates">热重载 + 编程式 RPC 更新</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="配置文件 + Provider 解析" data-en="Config file + Provider resolution">配置文件 + Provider 解析</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider max-w-6xl mx-auto"></div>
+
+    <!-- Section 4: Channels -->
+    <section class="py-20 px-4" id="channels">
+      <div class="max-w-6xl mx-auto">
+        <div class="fade-in mb-10">
+          <span class="inline-block text-xs font-bold tracking-wider uppercase text-claw mb-2">04</span>
+          <h2 class="text-3xl sm:text-4xl font-bold mb-3" data-zh="Channel 接入" data-en="Channel Integration">Channel 接入</h2>
+          <p class="text-gray-400" data-zh="消息平台覆盖范围与接入架构" data-en="Messaging platform coverage and integration architecture">消息平台覆盖范围与接入架构</p>
+        </div>
+        <div class="fade-in grid md:grid-cols-2 gap-6">
+          <!-- OpenClaw Channels -->
+          <div class="rounded-2xl border border-claw/15 bg-claw-bg/20 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-bold gradient-text-claw" data-zh="OpenClaw" data-en="OpenClaw">OpenClaw</h3>
+              <span class="text-xs font-bold px-3 py-1 rounded-full bg-claw/20 text-claw" data-zh="20+ 通道" data-en="20+ Channels">20+ 通道</span>
+            </div>
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span class="px-2 py-1 rounded-md bg-white/5 text-xs text-gray-300">Slack</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-xs text-gray-300">Discord</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-xs text-gray-300">Telegram</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-xs text-gray-300">WhatsApp</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-xs text-gray-300">iMessage</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-xs text-gray-300">SMS</span>
+              <span class="px-2 py-1 rounded-md bg-claw/20 text-xs text-claw" data-zh="Web UI" data-en="Web UI">Web UI</span>
+            </div>
+            <ul class="space-y-2 text-sm text-gray-400">
+              <li class="flex items-start gap-2">
+                <span class="text-claw mt-0.5">▸</span>
+                <span data-zh="Gateway 统一路由，所有消息进同一 session" data-en="Gateway unified routing, all messages into one session">Gateway 统一路由，所有消息进同一 session</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-claw mt-0.5">▸</span>
+                <span data-zh="多 Agent 路由 + Plugin 通道" data-en="Multi-agent routing + Plugin channels">多 Agent 路由 + Plugin 通道</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-claw mt-0.5">▸</span>
+                <span data-zh="共享 Slack Workspace 风险评估工具" data-en="Shared Slack Workspace risk assessment tool">共享 Slack Workspace 风险评估工具</span>
+              </li>
+            </ul>
+          </div>
+          <!-- Hermes Channels -->
+          <div class="rounded-2xl border border-hermes/15 bg-hermes-bg/20 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-bold gradient-text-hermes" data-zh="Hermes Agent" data-en="Hermes Agent">Hermes Agent</h3>
+              <span class="text-xs font-bold px-3 py-1 rounded-full bg-hermes/20 text-hermes" data-zh="15+ 通道" data-en="15+ Channels">15+ 通道</span>
+            </div>
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span class="px-2 py-1 rounded-md bg-white/5 text-xs text-gray-300">Slack</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-xs text-gray-300">Discord</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-xs text-gray-300">Telegram</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-xs text-gray-300">WhatsApp</span>
+              <span class="px-2 py-1 rounded-md bg-hermes/20 text-xs text-hermes">Signal</span>
+              <span class="px-2 py-1 rounded-md bg-hermes/20 text-xs text-hermes">钉钉</span>
+              <span class="px-2 py-1 rounded-md bg-hermes/20 text-xs text-hermes">飞书</span>
+              <span class="px-2 py-1 rounded-md bg-hermes/20 text-xs text-hermes">企业微信</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-xs text-gray-300">Matrix</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-xs text-gray-300">Email</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-xs text-gray-300">Home Assistant</span>
+            </div>
+            <ul class="space-y-2 text-sm text-gray-400">
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span data-zh="Messaging Gateway，支持跨平台对话连续性" data-en="Messaging Gateway with cross-platform conversation continuity">Messaging Gateway，支持跨平台对话连续性</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span data-zh="CLI 开始任务 → Telegram 通知 → 继续工作" data-en="Start task on CLI → Telegram notification → continue work">CLI 开始任务 → Telegram 通知 → 继续工作</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span data-zh="DM 配对系统（端到端加密支持 Signal）" data-en="DM pairing system (E2E encryption support for Signal)">DM 配对系统（端到端加密支持 Signal）</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider max-w-6xl mx-auto"></div>
+
+    <!-- Section 5: Memory & Learning -->
+    <section class="py-20 px-4" id="memory">
+      <div class="max-w-6xl mx-auto">
+        <div class="fade-in mb-10">
+          <span class="inline-block text-xs font-bold tracking-wider uppercase text-claw mb-2">05</span>
+          <h2 class="text-3xl sm:text-4xl font-bold mb-3" data-zh="Memory 与学习能力" data-en="Memory & Learning">Memory 与学习能力</h2>
+          <p class="text-gray-400" data-zh="记忆机制与自我进化能力是关键差异点" data-en="Memory mechanisms and self-evolution are key differentiators">记忆机制与自我进化能力是关键差异点</p>
+        </div>
+        <div class="fade-in grid md:grid-cols-2 gap-6">
+          <!-- OpenClaw Memory -->
+          <div class="rounded-2xl border border-white/10 bg-surface-lighter p-6">
+            <h3 class="text-lg font-bold gradient-text-claw mb-4" data-zh="OpenClaw Memory" data-en="OpenClaw Memory">OpenClaw Memory</h3>
+            <ul class="space-y-3 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="text-claw mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="每个 Assistant 独立持久化存储" data-en="Independent persistent storage per Assistant">每个 Assistant 独立持久化存储</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-claw mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="团队场景数据隔离（支持/销售/内部运营）" data-en="Team scenario data isolation (support/sales/ops)">团队场景数据隔离（支持/销售/内部运营）</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-claw mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="团队成员与同一 Assistant 交互，共享上下文" data-en="Team members interact with same Assistant, share context">团队成员与同一 Assistant 交互，共享上下文</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-gray-600 mt-0.5">✗</span>
+                <span class="text-gray-500" data-zh="无自学习循环" data-en="No self-learning loop">无自学习循环</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-gray-600 mt-0.5">✗</span>
+                <span class="text-gray-500" data-zh="无全文检索或 LLM 摘要" data-en="No full-text search or LLM summarization">无全文检索或 LLM 摘要</span>
+              </li>
+            </ul>
+          </div>
+          <!-- Hermes Memory -->
+          <div class="rounded-2xl border border-hermes/15 bg-hermes-bg/20 p-6">
+            <h3 class="text-lg font-bold gradient-text-hermes mb-4" data-zh="Hermes Memory" data-en="Hermes Memory">Hermes Memory</h3>
+            <ul class="space-y-3 text-sm">
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="三层记忆：Session / Persistent / Skill Memory" data-en="Three-layer memory: Session / Persistent / Skill">三层记忆：Session / Persistent / Skill Memory</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="FTS5 全文检索 + LLM 摘要" data-en="FTS5 full-text search + LLM summarization">FTS5 全文检索 + LLM 摘要</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="Honcho 辩证用户建模" data-en="Honcho dialectic user modeling">Honcho 辩证用户建模</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="自动技能生成 + 技能自改进" data-en="Auto skill generation + skill self-improvement">自动技能生成 + 技能自改进</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="容量管理 + 重复预防 + 安全扫描" data-en="Capacity management + duplicate prevention + security scan">容量管理 + 重复预防 + 安全扫描</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-hermes mt-0.5">▸</span>
+                <span class="text-gray-300" data-zh="Session Search（会话搜索）+ 外部 Memory Providers" data-en="Session Search + external Memory Providers">Session Search + 外部 Memory Providers</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider max-w-6xl mx-auto"></div>
+
+    <!-- Section 6: Ecosystem -->
+    <section class="py-20 px-4" id="ecosystem">
+      <div class="max-w-6xl mx-auto">
+        <div class="fade-in mb-10">
+          <span class="inline-block text-xs font-bold tracking-wider uppercase text-claw mb-2">06</span>
+          <h2 class="text-3xl sm:text-4xl font-bold mb-3" data-zh="生态与扩展" data-en="Ecosystem & Extensions">生态与扩展</h2>
+          <p class="text-gray-400" data-zh="生态系统成熟度与扩展能力的对比" data-en="Comparing ecosystem maturity and extensibility">生态系统成熟度与扩展能力的对比</p>
+        </div>
+        <div class="fade-in grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          <div class="rounded-xl border border-claw/15 bg-claw-bg/20 p-4 text-center">
+            <div class="text-3xl font-black gradient-text-claw mb-1">353K</div>
+            <div class="text-xs text-gray-400" data-zh="OpenClaw GitHub Stars" data-en="OpenClaw GitHub Stars">OpenClaw GitHub Stars</div>
+          </div>
+          <div class="rounded-xl border border-hermes/15 bg-hermes-bg/20 p-4 text-center">
+            <div class="text-3xl font-black gradient-text-hermes mb-1">64K</div>
+            <div class="text-xs text-gray-400" data-zh="Hermes GitHub Stars" data-en="Hermes GitHub Stars">Hermes GitHub Stars</div>
+          </div>
+          <div class="rounded-xl border border-claw/15 bg-claw-bg/20 p-4 text-center">
+            <div class="text-3xl font-black gradient-text-claw mb-1">10,700+</div>
+            <div class="text-xs text-gray-400" data-zh="ClawHub Skills" data-en="ClawHub Skills">ClawHub Skills</div>
+          </div>
+          <div class="rounded-xl border border-hermes/15 bg-hermes-bg/20 p-4 text-center">
+            <div class="text-3xl font-black gradient-text-hermes mb-1">agentskills.io</div>
+            <div class="text-xs text-gray-400" data-zh="Skills Hub 兼容" data-en="Skills Hub Compatible">Skills Hub 兼容</div>
+          </div>
+        </div>
+        <div class="fade-in overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-white/10">
+                <th class="text-left py-3 px-4 font-semibold text-gray-400" data-zh="项目" data-en="Feature">项目</th>
+                <th class="text-left py-3 px-4"><span class="gradient-text-claw font-bold">OpenClaw</span></th>
+                <th class="text-left py-3 px-4"><span class="gradient-text-hermes font-bold">Hermes Agent</span></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="License" data-en="License">License</td>
+                <td class="py-4 px-4 text-gray-400">MIT</td>
+                <td class="py-4 px-4 text-gray-400">MIT</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="Skill 生态" data-en="Skill ecosystem">Skill 生态</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="ClawHub（10,700+），文件优先级系统" data-en="ClawHub (10,700+), file precedence system">ClawHub（10,700+），文件优先级系统</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="agentskills.io 兼容，Skills Hub" data-en="agentskills.io compatible, Skills Hub">agentskills.io 兼容，Skills Hub</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="插件系统" data-en="Plugin system">插件系统</td>
+                <td class="py-4 px-4 text-claw font-medium" data-zh="Plugin slots（Exclusive 槽位）+ npm 可安装" data-en="Plugin slots (Exclusive) + npm installable">Plugin slots（Exclusive 槽位）+ npm 可安装</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="内置 Plugin System" data-en="Built-in Plugin System">内置 Plugin System</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="MCP" data-en="MCP">MCP</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="支持" data-en="Supported">支持</td>
+                <td class="py-4 px-4 text-hermes font-medium" data-zh="支持（有实用设置模式和教程）" data-en="Supported (with practical setup patterns & tutorials)">支持（有实用设置模式和教程）</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="Model 支持" data-en="Model support">Model 支持</td>
+                <td class="py-4 px-4 text-gray-400" data-zh="多模型" data-en="Multi-model">多模型</td>
+                <td class="py-4 px-4 text-hermes font-medium" data-zh="更广泛（Nous Portal / OpenRouter / OpenAI / 任意端点）" data-en="Broader (Nous Portal / OpenRouter / OpenAI / any endpoint)">更广泛（Nous Portal / OpenRouter / OpenAI / 任意端点）</td>
+              </tr>
+              <tr class="table-row-hover">
+                <td class="py-4 px-4 font-medium text-gray-300" data-zh="研究能力" data-en="Research">研究能力</td>
+                <td class="py-4 px-4 text-gray-500" data-zh="否" data-en="No">否</td>
+                <td class="py-4 px-4 text-hermes font-medium" data-zh="RL 训练（Atropos）/ Batch Processing / Trajectory Export" data-en="RL training (Atropos) / Batch Processing / Trajectory Export">RL 训练（Atropos）/ Batch Processing / Trajectory Export</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="section-divider max-w-4xl mx-auto"></div>
+
+  <!-- Decision Tree / Conclusion -->
+  <section id="conclusion" class="py-20 px-4">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12 fade-in">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4" data-zh="选型决策" data-en="Decision Matrix">选型决策</h2>
+        <p class="text-gray-400" data-zh="根据你的核心需求快速定位" data-en="Quickly find your fit based on core requirements">根据你的核心需求快速定位</p>
+      </div>
+      <div class="fade-in space-y-4">
+        <!-- OpenClaw scenarios -->
+        <div class="rounded-2xl border border-claw/15 bg-claw-bg/20 p-6">
+          <h3 class="text-lg font-bold gradient-text-claw mb-4" data-zh="选择 OpenClaw 如果：" data-en="Choose OpenClaw if:">选择 OpenClaw 如果：</h3>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5">
+              <span class="text-claw text-lg font-bold">01</span>
+              <span class="text-sm text-gray-300" data-zh="需要 20+ 消息通道覆盖（iMessage、SMS、Web UI）" data-en="Need 20+ channel coverage (iMessage, SMS, Web UI)">需要 20+ 消息通道覆盖（iMessage、SMS、Web UI）</span>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5">
+              <span class="text-claw text-lg font-bold">02</span>
+              <span class="text-sm text-gray-300" data-zh="重视团队场景的数据隔离和共享 Assistant" data-en="Value team data isolation and shared Assistants">重视团队场景的数据隔离和共享 Assistant</span>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5">
+              <span class="text-claw text-lg font-bold">03</span>
+              <span class="text-sm text-gray-300" data-zh="需要 Web Control UI 和移动端访问" data-en="Need Web Control UI and mobile access">需要 Web Control UI 和移动端访问</span>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5">
+              <span class="text-claw text-lg font-bold">04</span>
+              <span class="text-sm text-gray-300" data-zh="依赖庞大 Skill 生态（10,700+ ClawHub）" data-en="Rely on large Skill ecosystem (10,700+ ClawHub)">依赖庞大 Skill 生态（10,700+ ClawHub）</span>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5">
+              <span class="text-claw text-lg font-bold">05</span>
+              <span class="text-sm text-gray-300" data-zh="需要内置安全审计工具和热重载配置" data-en="Need built-in security audit and hot-reload config">需要内置安全审计工具和热重载配置</span>
+            </div>
+          </div>
+        </div>
+        <!-- Hermes scenarios -->
+        <div class="rounded-2xl border border-hermes/15 bg-hermes-bg/20 p-6">
+          <h3 class="text-lg font-bold gradient-text-hermes mb-4" data-zh="选择 Hermes Agent 如果：" data-en="Choose Hermes Agent if:">选择 Hermes Agent 如果：</h3>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5">
+              <span class="text-hermes text-lg font-bold">01</span>
+              <span class="text-sm text-gray-300" data-zh="需要自主学习和自我改进能力" data-en="Need autonomous learning and self-improvement">需要自主学习和自我改进能力</span>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5">
+              <span class="text-hermes text-lg font-bold">02</span>
+              <span class="text-sm text-gray-300" data-zh="需要 Signal/钉钉/飞书/企业微信等通道" data-en="Need Signal/DingTalk/Feishu/WeCom channels">需要 Signal/钉钉/飞书/企业微信等通道</span>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5">
+              <span class="text-hermes text-lg font-bold">03</span>
+              <span class="text-sm text-gray-300" data-zh="需要 Serverless 部署（低成本空闲）" data-en="Need Serverless deployment (low idle cost)">需要 Serverless 部署（低成本空闲）</span>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5">
+              <span class="text-hermes text-lg font-bold">04</span>
+              <span class="text-sm text-gray-300" data-zh="需要 FTS5 全文检索 + LLM 记忆摘要" data-en="Need FTS5 full-text search + LLM memory summarization">需要 FTS5 全文检索 + LLM 记忆摘要</span>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-white/5">
+              <span class="text-hermes text-lg font-bold">05</span>
+              <span class="text-sm text-gray-300" data-zh="进行 AI 研究（RL 训练、Batch Processing）或需要语音交互" data-en="Conduct AI research (RL training, Batch Processing) or need voice interaction">进行 AI 研究（RL 训练、Batch Processing）或需要语音交互</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider max-w-4xl mx-auto"></div>
+
+  <!-- Sources -->
+  <section class="py-16 px-4">
+    <div class="max-w-4xl mx-auto">
+      <div class="fade-in text-center mb-8">
+        <h2 class="text-2xl font-bold mb-2" data-zh="数据来源" data-en="Sources">数据来源</h2>
+      </div>
+      <div class="fade-in grid sm:grid-cols-2 gap-3 text-sm">
+        <a href="https://docs.openclaw.ai/" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-white/5 hover:bg-white/5 transition-colors text-gray-400 hover:text-gray-200">
+          <span class="text-claw">▸</span>
+          OpenClaw 官方文档
+        </a>
+        <a href="https://hermes-agent.nousresearch.com/docs" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-white/5 hover:bg-white/5 transition-colors text-gray-400 hover:text-gray-200">
+          <span class="text-hermes">▸</span>
+          Hermes Agent 官方文档
+        </a>
+        <a href="https://github.com/nousresearch/hermes-agent" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-white/5 hover:bg-white/5 transition-colors text-gray-400 hover:text-gray-200">
+          <span class="text-hermes">▸</span>
+          Hermes Agent GitHub
+        </a>
+        <a href="https://getclaw.sh/blog/openclaw-vs-hermes-agent-feature-comparison-founders-2026" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-white/5 hover:bg-white/5 transition-colors text-gray-400 hover:text-gray-200">
+          <span class="text-claw">▸</span>
+          OpenClaw vs Hermes Feature Comparison (getclaw.sh)
+        </a>
+        <a href="https://utilo.io/en/home/blog/hermes-vs-claude-code-vs-openclaw-2026" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-white/5 hover:bg-white/5 transition-colors text-gray-400 hover:text-gray-200">
+          <span class="text-gray-500">▸</span>
+          Hermes vs Claude Code vs OpenClaw (utilo.io)
+        </a>
+        <a href="https://cognio.so/resources/guides/openclaw-vs-hermes" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-white/5 hover:bg-white/5 transition-colors text-gray-400 hover:text-gray-200">
+          <span class="text-gray-500">▸</span>
+          OpenClaw vs Hermes (cognio.so)
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-8 px-4 border-t border-white/5">
+    <div class="max-w-4xl mx-auto text-center text-xs text-gray-600">
+      <p data-zh="基于公开文档与社区评测整理 · 数据截至 2026 年 4 月" data-en="Compiled from public documentation and community reviews · Data as of April 2026">基于公开文档与社区评测整理 · 数据截至 2026 年 4 月</p>
+    </div>
+  </footer>
+
+  <script>
+    // Language toggle
+    let currentLang = 'zh';
+    function toggleLang() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      document.getElementById('langLabel').textContent = currentLang === 'zh' ? 'EN' : '中文';
+      document.querySelectorAll('[data-zh]').forEach(el => {
+        const text = el.getAttribute(`data-${currentLang}`);
+        if (text) el.textContent = text;
+      });
+      updateChartLabels();
+    }
+
+    // Radar Chart
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    const chartLabels = ['生态成熟度', '自主学习', '部署灵活性', '安全性', 'Channel 覆盖', 'Memory 能力', '上手难度', 'Web UI'];
+    const chartLabelsEn = ['Ecosystem', 'Auto Learning', 'Deployment', 'Security', 'Channels', 'Memory', 'Ease of Use', 'Web UI'];
+
+    function getLabels() { return currentLang === 'zh' ? chartLabels : chartLabelsEn; }
+    function updateChartLabels() {
+      radarChart.data.labels = getLabels();
+      radarChart.update();
+    }
+
+    const radarChart = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: getLabels(),
+        datasets: [{
+          label: 'OpenClaw',
+          data: [5, 2, 3, 4, 5, 3, 4, 5],
+          backgroundColor: 'rgba(255, 107, 53, 0.15)',
+          borderColor: '#FF6B35',
+          borderWidth: 2,
+          pointBackgroundColor: '#FF6B35',
+          pointRadius: 4,
+        }, {
+          label: 'Hermes Agent',
+          data: [3, 5, 4, 4, 3, 5, 4, 2],
+          backgroundColor: 'rgba(255, 215, 0, 0.15)',
+          borderColor: '#FFD700',
+          borderWidth: 2,
+          pointBackgroundColor: '#FFD700',
+          pointRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#9ca3af',
+              padding: 20,
+              font: { size: 13, family: "'Inter', 'Noto Sans SC', sans-serif" },
+              usePointStyle: true,
+            }
+          }
+        },
+        scales: {
+          r: {
+            angleLines: { color: 'rgba(255,255,255,0.08)' },
+            grid: { color: 'rgba(255,255,255,0.08)' },
+            pointLabels: {
+              color: '#9ca3af',
+              font: { size: 11, family: "'Inter', 'Noto Sans SC', sans-serif" }
+            },
+            ticks: {
+              stepSize: 1,
+              color: '#6b7280',
+              backdropColor: 'transparent',
+              font: { size: 10 },
+            },
+            suggestedMin: 0,
+            suggestedMax: 5,
+          }
+        }
+      }
+    });
+
+    // Scroll animation
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
